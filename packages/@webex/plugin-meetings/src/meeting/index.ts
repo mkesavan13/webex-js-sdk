@@ -3605,8 +3605,7 @@ export default class Meeting extends StatelessWebexPlugin {
    * @memberof Meeting
    */
   closeRemoteStreams() {
-    const {remoteAudioStream, remoteVideoStream, remoteShareStream, shareAudioStream} =
-      this.mediaProperties;
+    const {remoteAudioStream, remoteVideoStream, remoteShareStream} = this.mediaProperties;
 
     /**
      * Triggers an event to the developer
@@ -3647,7 +3646,6 @@ export default class Meeting extends StatelessWebexPlugin {
       stopStream(remoteAudioStream, EVENT_TYPES.REMOTE_AUDIO),
       stopStream(remoteVideoStream, EVENT_TYPES.REMOTE_VIDEO),
       stopStream(remoteShareStream, EVENT_TYPES.REMOTE_SHARE),
-      stopStream(shareAudioStream, EVENT_TYPES.REMOTE_SHARE_AUDIO),
     ]);
   }
 
@@ -3778,7 +3776,7 @@ export default class Meeting extends StatelessWebexPlugin {
     functionName: string;
     isPublished: boolean;
     mediaType: MediaType;
-    stream: MediaStream;
+    stream: LocalStream;
   }) {
     const {functionName, isPublished, mediaType, stream} = options;
     Trigger.trigger(
@@ -7707,9 +7705,13 @@ export default class Meeting extends StatelessWebexPlugin {
       .update({
         // TODO: RoapMediaConnection is not ready to use stream classes yet, so we pass the raw MediaStreamTrack for now
         localTracks: {
+          // @ts-expect-error
           audio: this.mediaProperties.audioStream?.outputTrack || null,
+          // @ts-expect-error
           video: this.mediaProperties.videoStream?.outputTrack || null,
+          // @ts-expect-error
           screenShareVideo: this.mediaProperties.shareVideoStream?.outputTrack || null,
+          // @ts-expect-error
           screenShareAudio: this.mediaProperties.shareAudioStream?.outputTrack || null,
         },
         direction: {

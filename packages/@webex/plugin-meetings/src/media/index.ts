@@ -217,9 +217,13 @@ Media.createMediaConnection = (
     {
       // TODO: RoapMediaConnection is not ready to use stream classes yet, so we pass the raw MediaStreamTrack for now SPARK-460530
       localTracks: {
+        // @ts-expect-error
         audio: audioStream?.outputTrack,
+        // @ts-expect-error
         video: videoStream?.outputTrack,
+        // @ts-expect-error
         screenShareVideo: shareVideoStream?.outputTrack,
+        // @ts-expect-error
         screenShareAudio: shareAudioStream?.outputTrack, // TODO: add type for screenShareAudio in internal-media-core SPARK-446923
       } as unknown,
       direction: {
@@ -399,6 +403,7 @@ Media.stopStream = (stream: LocalStream) => {
       stream.stop();
     } catch (e) {
       LoggerProxy.logger.error(
+        // @ts-expect-error
         `Media:index#stopStream --> Unable to stop the stream with ready state of the output track => ${stream.outputTrack.readyState} & input track => ${stream.inputTrack.readyState}, error: ${e}`
       );
     }

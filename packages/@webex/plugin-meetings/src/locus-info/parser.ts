@@ -690,7 +690,7 @@ export default class Parser {
    */
   private stopSyncTimer() {
     if (this.syncTimer !== null) {
-      clearTimeout(this.syncTimer);
+      clearTimeout(this.syncTimer as number);
       this.syncTimer = null;
     }
   }

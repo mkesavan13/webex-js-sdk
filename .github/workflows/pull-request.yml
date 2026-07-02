@@ -81,15 +81,9 @@ jobs:
           echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
           echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
-      - name: Cache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
-
       - id: validate-dependencies
         name: Validate Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
@@ -118,13 +112,6 @@ jobs:
             exit 1
           fi
 
-      - name: Cache Dependencies
-        uses: actions/cache@v3
-        if: steps.validate-dependencies.outputs.cache-hit != 'true'
-        with:
-          path: '**/node_modules'
-          key: node-modules-${{ hashFiles('./yarn.lock') }}
-
   build:
     name: Build Packages
     needs: initialize
@@ -144,14 +131,17 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
@@ -168,11 +158,12 @@ jobs:
       - name: Build Other Packages
         run: yarn workspaces foreach --parallel --topological --verbose run build:src
 
-      - name: Cache Distributables
-        uses: actions/cache@v3
+      - name: Upload Distributables
+        uses: actions/upload-artifact@v4
         with:
+          name: dist-${{ env.rid }}
           path: '**/dist'
-          key: dist-${{ env.rid }}
+          if-no-files-found: error
 
 
   generate-package-matrix:
@@ -198,23 +189,26 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
 
-      - name: Uncache Distributables
-        uses: actions/cache@v3
+      - name: Download Distributables
+        uses: actions/download-artifact@v4
         with:
-          path: '**/dist'
-          key: dist-${{ env.rid }}
+          name: dist-${{ env.rid }}
+          path: .
 
       - name: Synchronize Packages
         run: yarn
@@ -256,23 +250,26 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
 
-      - name: Uncache Distributables
-        uses: actions/cache@v3
+      - name: Download Distributables
+        uses: actions/download-artifact@v4
         with:
-          path: '**/dist'
-          key: dist-${{ env.rid }}
+          name: dist-${{ env.rid }}
+          path: .
 
       - name: Synchronize Packages
         run: yarn
@@ -300,23 +297,26 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
 
-      - name: Uncache Distributables
-        uses: actions/cache@v3
+      - name: Download Distributables
+        uses: actions/download-artifact@v4
         with:
-          path: '**/dist'
-          key: dist-${{ env.rid }}
+          name: dist-${{ env.rid }}
+          path: .
 
       - name: Synchronize Packages
         run: yarn
@@ -345,23 +345,26 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
 
-      - name: Uncache Distributables
-        uses: actions/cache@v3
+      - name: Download Distributables
+        uses: actions/download-artifact@v4
         with:
-          path: '**/dist'
-          key: dist-${{ env.rid }}
+          name: dist-${{ env.rid }}
+          path: .
 
       - name: Synchronize Packages
         run: yarn
@@ -392,23 +395,26 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
 
-      - name: Uncache Distributables
-        uses: actions/cache@v3
+      - name: Download Distributables
+        uses: actions/download-artifact@v4
         with:
-          path: '**/dist'
-          key: dist-${{ env.rid }}
+          name: dist-${{ env.rid }}
+          path: .
 
       - name: Synchronize Packages
         run: yarn
@@ -435,23 +441,26 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
 
-      - name: Uncache Distributables
-        uses: actions/cache@v3
+      - name: Download Distributables
+        uses: actions/download-artifact@v4
         with:
-          path: '**/dist'
-          key: dist-${{ env.rid }}
+          name: dist-${{ env.rid }}
+          path: .
 
       - name: Synchronize Packages
         run: yarn
@@ -480,23 +489,26 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
-      - name: Uncache Environment Variables
-        uses: actions/cache@v3
-        with:
-          path: './.env'
-          key: env-${{ env.rid }}
+      - name: Write Environment Variables
+        run: |
+          touch ./.env
+          echo "SKIP_FLAKY_TESTS=\"${{ secrets.SKIP_FLAKY_TESTS }}\"" >> ./.env
+          echo "WEBEX_APPID_ORGID=\"${{ secrets.WEBEX_APPID_ORGID }}\"" >> ./.env
+          echo "WEBEX_APPID_SECRET=\"${{ secrets.WEBEX_APPID_SECRET }}\"" >> ./.env
+          echo "WEBEX_CLIENT_ID=\"${{ secrets.WEBEX_CLIENT_ID }}\"" >> ./.env
+          echo "WEBEX_CLIENT_SECRET=\"${{ secrets.WEBEX_CLIENT_SECRET }}\"" >> ./.env
 
       - name: Uncache Dependencies
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: '**/node_modules'
           key: node-modules-${{ hashFiles('./yarn.lock') }}
 
-      - name: Uncache Distributables
-        uses: actions/cache@v3
+      - name: Download Distributables
+        uses: actions/download-artifact@v4
         with:
-          path: '**/dist'
-          key: dist-${{ env.rid }}
+          name: dist-${{ env.rid }}
+          path: .
 
       - name: Synchronize Packages
         run: yarn
